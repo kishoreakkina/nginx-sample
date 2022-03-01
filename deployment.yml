@@ -1,0 +1,45 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sample-app
+  namespace: sandbox
+  labels:
+    app: sample-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sample-app
+  template:
+    metadata:
+      labels:
+        app: sample-app
+    spec:
+      containers:
+      - name: server
+        image: nginx:1.17
+        volumeMounts:
+          - name: sample-app
+            mountPath: /usr/share/nginx/html
+        ports:
+        - containerPort: 80
+          protocol: TCP
+        resources:
+          requests:
+            cpu: 100m
+            memory: "128M"
+          limits:
+            cpu: 100m
+            memory: "256M"
+        env:
+        - name: LOG_LEVEL
+          value: "DEBUG"
+      volumes:
+      - name: sample-app
+        configMap:
+          name: sample-app
+          items:
+          - key: body
+            path: index.html
+
